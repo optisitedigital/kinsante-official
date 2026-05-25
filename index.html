@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OptiSchool - Portail Sécurisé</title>
+    <title>OptiSchool - Système Anti-Faille</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -20,7 +20,6 @@
 
     <div id="toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm pointer-events-none"></div>
 
-    <!-- SECTION 1 : CONNEXION -->
     <section id="sec-login" class="min-h-screen flex flex-col items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 p-6 text-center">
             <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">O</div>
@@ -38,7 +37,6 @@
         </div>
     </section>
 
-    <!-- SECTION 2 : MENU PRINCIPAL -->
     <section id="sec-dashboard" class="min-h-screen hidden-section p-4 max-w-md mx-auto flex flex-col justify-center">
         <div class="text-center mb-8">
             <h2 class="text-2xl font-bold text-slate-900">Bienvenue sur OptiSchool</h2>
@@ -49,20 +47,19 @@
                 <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl text-xl">🛡️</div>
                 <div>
                     <h3 class="font-bold text-slate-900 text-lg">Borne École / Guérite</h3>
-                    <p class="text-xs text-slate-500">Scanner et enregistrer l'entrée des élèves un par un.</p>
+                    <p class="text-xs text-slate-500">Scanner et enregistrer l'entrée sécurisée des élèves.</p>
                 </div>
             </button>
             <button onclick="basculerVers('sec-parent')" class="w-full bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4 text-left active:scale-[0.98] transition-all">
                 <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl text-xl">📱</div>
                 <div>
                     <h3 class="font-bold text-slate-900 text-lg">Espace Parent</h3>
-                    <p class="text-xs text-slate-500">Suivre les arrivées d'un enfant et lire les communiqués.</p>
+                    <p class="text-xs text-slate-500">Suivre les arrivées en direct et lire les communiqués.</p>
                 </div>
             </button>
         </div>
     </section>
 
-    <!-- SECTION 3 : BORNE GUÉRITE -->
     <section id="sec-borne" class="min-h-screen hidden-section p-4 max-w-md mx-auto flex flex-col">
         <div class="flex items-center justify-between py-4 border-b border-slate-100 mb-6">
             <button onclick="basculerVers('sec-dashboard')" class="text-sm font-medium text-slate-500 hover:text-slate-800">← Menu Principal</button>
@@ -72,28 +69,26 @@
             <div class="text-center">
                 <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4 text-xl">🎯</div>
                 <h2 class="text-xl font-bold text-slate-900">Enregistrement Élève</h2>
-                <p class="text-xs text-slate-500 mt-1">Saisissez ou scannez le matricule de l'élève.</p>
+                <p class="text-xs text-slate-500 mt-1">Saisissez ou scannez le matricule.</p>
             </div>
 
-            <!-- Boîte de retour d'infos dynamique sur le scan -->
             <div id="borne-feedback-box" class="hidden-section my-4 p-4 rounded-xl text-center border">
                 <p id="borne-feedback-statut" class="text-xs font-semibold uppercase tracking-wider">-</p>
                 <h4 id="borne-feedback-nom" class="text-lg font-bold text-slate-900 mt-1">-</h4>
-                <p id="borne-feedback-matricule" class="text-sm font-mono text-slate-600"></p>
+                <p id="borne-feedback-details" class="text-sm text-slate-600 font-medium"></p>
             </div>
 
-            <form onsubmit="soumettrePointageSecurise(event)" class="my-6 space-y-4">
+            <form onsubmit="soumettrePointageFailsafe(event)" class="my-6 space-y-4">
                 <input type="text" id="matricule-input" required placeholder="Ex: MAT-001" class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-xl text-center font-bold text-2xl tracking-wide uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all">
                 <button type="submit" id="btn-valider-pointage" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 rounded-xl transition-all">Valider et Enregistrer</button>
             </form>
             <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
                 <button onclick="effacerBorne()" class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-xl transition-all">↺ Effacer</button>
-                <button onclick="suivantBorne()" class="py-2.5 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm rounded-xl transition-all">Élève Suivant →</button>
+                <button onclick="suivantBorne()" class="py-2.5 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium text-sm rounded-xl transition-all">Suivant →</button>
             </div>
         </div>
     </section>
 
-    <!-- SECTION 4 : ESPACE PARENT -->
     <section id="sec-parent" class="min-h-screen hidden-section p-4 max-w-md mx-auto flex flex-col">
         <div class="flex items-center justify-between py-4 border-b border-slate-100 mb-6">
             <button onclick="basculerVers('sec-dashboard')" class="text-sm font-medium text-slate-500 hover:text-slate-800">← Menu Principal</button>
@@ -107,15 +102,13 @@
             </div>
         </div>
 
-        <!-- Bloc d'abonnement expiré -->
         <div id="parent-lock-screen" class="hidden-section bg-white rounded-2xl shadow-sm border border-rose-100 p-8 text-center my-auto space-y-4">
             <div class="text-4xl">🔒</div>
             <h3 class="text-lg font-bold text-rose-600">Accès Suspendu</h3>
-            <p id="lock-screen-text" class="text-sm text-slate-500">L'abonnement de ce matricule est expiré. Veuillez régulariser l'accès pour voir les données en direct.</p>
+            <p id="lock-screen-text" class="text-sm text-slate-500">L'abonnement de suivi pour ce matricule est terminé.</p>
             <a href="https://wa.me/243819679859?text=Bonjour%20OptiSchool,%20je%20souhaite%20r%C3%A9gulariser%20l'abonnement%20de%20mon%20enfant." target="_blank" class="inline-block w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition-all">🟢 Régulariser via WhatsApp</a>
         </div>
 
-        <!-- Fiche Enfant -->
         <div id="parent-data-box" class="hidden-section flex-1 flex flex-col space-y-6">
             <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
                 <div>
@@ -139,8 +132,8 @@
     </section>
 
     <script>
-        // 🚀 URL mise à jour avec ton nouveau lien Apps Script
-        const API_URL = "https://script.google.com/macros/s/AKfycbwTFWigH50VrRn3cLdC95J97NEDJ4iYzrbaU0SgQCQywVbukm1iqPkn-SwcSDr_wnIb2g/exec";
+        // 🚀 Nouvelle URL de ton API Google Apps Script avec protection anti-faille
+        const API_URL = "https://script.google.com/macros/s/AKfycbyTdx7NULxbzdvBmkafDK19fxiLvIosa2egpFAJmTUZKueKeo6MPG9ucSJKJVTzIRGStw/exec";
 
         function showToast(message, isSuccess = true) {
             const container = document.getElementById('toast-container');
@@ -158,7 +151,7 @@
             document.getElementById(idSection).classList.remove('hidden-section');
         }
 
-        /* 🔐 1. CONNEXION */
+        /* 🔐 1. CONNEXION SÉCURISÉE (Vérification côté Serveur) */
         function verifierMotDePasse(event) {
             event.preventDefault();
             const passwordInput = document.getElementById('input-password');
@@ -188,22 +181,22 @@
             });
         }
 
-        /* 🛡️ 2. BORNE AVEC SÉCURISATION DOUBLON ET ABONNEMENT EN DIRECT */
-        function soumettrePointageSecurise(event) {
+        /* 🛡️ 2. BORNE IMPÉNÉTRABLE (Vérification et Écriture Asynchrones) */
+        function soumettrePointageFailsafe(event) {
             event.preventDefault();
             const input = document.getElementById('matricule-input');
             const btn = document.getElementById('btn-valider-pointage');
             const feedbackBox = document.getElementById('borne-feedback-box');
             const feedbackNom = document.getElementById('borne-feedback-nom');
-            const feedbackMatricule = document.getElementById('borne-feedback-matricule');
+            const feedbackDetails = document.getElementById('borne-feedback-details');
             const feedbackStatut = document.getElementById('borne-feedback-statut');
             const matricule = input.value.trim().toUpperCase();
 
             if(!matricule) return;
             btn.disabled = true;
-            btn.innerHTML = "Analyse & Enregistrement (3s)...";
+            btn.innerHTML = "Traitement ultra-rapide...";
 
-            // ÉTAPE 1 : Lecture en direct sur le serveur
+            // ÉTAPE 1 : Analyse des droits de l'élève (Abonnement + Doublon du jour)
             fetch(API_URL + `?matricule=${encodeURIComponent(matricule)}`)
             .then(res => res.json())
             .then(data => {
@@ -211,27 +204,34 @@
                     throw new Error(data.message || "Matricule introuvable.");
                 }
 
-                // Vérification stricte d'abonnement
+                // Blocage immédiat si l'abonnement est expiré
                 if (data.statutAbonnement === "Inactif") {
-                    throw new Error("ALERTE : L'abonnement de cet élève est terminé ! Enregistrement refusé.");
+                    throw new Error("ALERTE : L'abonnement de cet élève est terminé !");
                 }
 
-                // Vérification de doublon
+                // Blocage immédiat si déjà scanné aujourd'hui
                 if (data.dejaPointeToday === true) {
                     throw new Error("REFUSÉ : Cet élève a déjà été enregistré aujourd'hui !");
                 }
 
+                // Préparation de l'affichage de validation
                 feedbackNom.innerText = data.eleve;
-                feedbackMatricule.innerText = `Code : ${matricule}`;
+                feedbackDetails.innerText = `Matricule : ${matricule} | Classe : ${data.classe || 'N/A'}`;
                 
-                // ÉTAPE 2 : Si tout est au vert, écriture dans l'historique
+                // ÉTAPE 2 : Envoi sécurisé pour écriture dans la feuille Historique (avec Classe incluse)
                 return fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'pointage', matricule: matricule })
                 });
             })
-            .then(() => {
+            .then(res => res.json())
+            .then(resultPost => {
+                if(resultPost && resultPost.success === false) {
+                    throw new Error(resultPost.message);
+                }
+                
+                // Succès de l'opération
                 btn.disabled = false;
                 btn.innerHTML = "Valider et Enregistrer";
                 feedbackStatut.innerText = "Scan Validé ✔️";
@@ -242,10 +242,11 @@
                 input.focus();
             })
             .catch((err) => {
+                // Gestion et affichage instantané de l'erreur / fraude sur l'écran du garde
                 btn.disabled = false;
                 btn.innerHTML = "Valider et Enregistrer";
-                feedbackNom.innerText = err.message || "Erreur critique";
-                feedbackMatricule.innerText = `Code tenté : ${matricule}`;
+                feedbackNom.innerText = err.message || "Erreur de communication";
+                feedbackDetails.innerText = `Code tapé : ${matricule}`;
                 feedbackStatut.innerText = "Pointage Bloqué ❌";
                 feedbackBox.className = "my-4 p-4 rounded-xl border border-rose-100 bg-rose-50/50 text-center text-rose-800";
                 feedbackBox.classList.remove('hidden-section');
@@ -286,8 +287,9 @@
                     return;
                 }
 
+                // Vérification stricte d'accès aux données de suivi
                 if(data.statutAbonnement === "Inactif") {
-                    document.getElementById('lock-screen-text').innerText = `L'abonnement de suivi pour ce matricule (${matricule}) est arrivé à terme. Veuillez renouveler la cotisation.`;
+                    document.getElementById('lock-screen-text').innerText = `L'abonnement de suivi pour le matricule ${matricule} est expiré. Veuillez régulariser la situation auprès de l'école.`;
                     document.getElementById('parent-lock-screen').classList.remove('hidden-section');
                     return;
                 }
@@ -351,7 +353,7 @@
             });
         }
 
-        /* ANTI-FRAUDE TERRAIN */
+        /* 🔐 SÉCURITÉ MAXIMUM & PROTECTION ANTIFRAUDE SUR LE TERRAIN */
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
         document.addEventListener('keydown', function(e) {
             if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || (e.ctrlKey && e.keyCode === 85)) {
