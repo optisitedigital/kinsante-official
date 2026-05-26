@@ -2,88 +2,584 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>KinSanté | Annuaire Santé</title>
+
+    <meta name="description" content="Trouvez et localisez en temps réel les hôpitaux, cliniques et spécialistes de santé disponibles à proximité à Kinshasa via KinSanté RDC.">
+    <meta name="keywords" content="KinSanté, annuaire médical Kinshasa, trouver hôpital RDC, cliniques ouvertes Kinshasa, géolocalisation hôpital">
+    <meta name="author" content="KinSanté RDC">
+    <meta name="theme-color" content="#0056b3">
+
+    <link rel="icon" type="image/png" href="logo-kinsante.png">
+    <link rel="apple-touch-icon" href="logo-kinsante.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        :root { --primary: #0284c7; --dark: #0f172a; --light: #f8fafc; --white: #ffffff; --gray: #64748b; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; }
+        :root {
+            --primary: #0056b3;
+            --primary-glow: rgba(0, 86, 179, 0.08);
+            --accent: #0ea5e9;
+            --accent-glow: rgba(14, 165, 233, 0.15);
+            --success: #10b981;
+            --bg: #f8fafc; 
+            --surface: rgba(255, 255, 255, 0.7); 
+            --surface-hover: rgba(255, 255, 255, 0.9);
+            --border: rgba(0, 86, 179, 0.08);
+            --text: #0f172a; 
+            --muted: #64748b;
+        }
 
-        /* Navigation */
-        header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .logo { font-weight: 800; font-size: 1.6rem; color: var(--primary); }
-        .nav-links { display: flex; list-style: none; gap: 30px; }
-        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 600; font-size: 0.9rem; }
-        .hamburger { display: none; font-size: 24px; cursor: pointer; color: var(--primary); }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
 
-        /* Recherche */
-        .page-title { text-align: center; margin: 50px 0 20px; }
-        .search-wrapper { max-width: 600px; margin: 0 auto 40px; padding: 0 20px; }
-        #searchBar { width: 100%; padding: 18px 25px; border-radius: 50px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.05); font-size: 1rem; outline: none; }
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--bg);
+        }
 
-        /* Grille Annuaire */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; padding: 20px 5%; max-width: 1200px; margin: 0 auto 50px; }
-        .card { background: white; border-radius: 24px; padding: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); }
-        .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; }
-        .category { background: #e0f2fe; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-        .card h3 { margin: 10px 0; }
-        .btn-cta { display: block; background: var(--primary); color: white; text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-weight: 700; margin-top: 15px; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-        @media (max-width: 768px) {
-            .nav-links { display: none; flex-direction: column; position: absolute; top: 80px; left: 0; width: 100%; background: white; padding: 40px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-            .nav-links.active { display: flex; gap: 25px; }
-            .hamburger { display: block; }
+        /* EFFET DE LUMIÈRE DIFFUSE */
+        .ambient-glow {
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 65%);
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(60px);
+        }
+
+        /* LOADER MINIMALISTE */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s;
+        }
+        
+        .spinner-box {
+            position: relative;
+            width: 56px;
+            height: 56px;
+        }
+
+        .spinner {
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(0, 86, 179, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* HEADER GLASSMORPHISM */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 5%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span { color: var(--accent); }
+        .logo img {
+            width: 42px;
+            height: 42px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 86, 179, 0.15);
+            border: 2px solid white;
+        }
+
+        /* HAMBURGER */
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 26px;
+            height: 18px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 100%;
+            height: 2.5px;
+            background-color: var(--primary);
+            border-radius: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: left center;
+        }
+
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translateY(-2px); background-color: var(--text); }
+        .hamburger.open span:nth-child(2) { width: 0%; opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translateY(2px); background-color: var(--text); }
+
+        /* DRAWER LATÉRAL */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -100%; 
+            width: 340px;
+            max-width: 85%;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 100px 40px 40px;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .side-menu.active { right: 0; }
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.15);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .menu-overlay.active { opacity: 1; visibility: visible; }
+
+        .nav-links { display: flex; flex-direction: column; list-style: none; gap: 20px; }
+        .nav-links li { width: 100%; opacity: 0; transform: translateX(30px); transition: all 0.4s ease; }
+        .side-menu.active .nav-links li { opacity: 1; transform: translateX(0); }
+        .side-menu.active .nav-links li:nth-child(1) { transition-delay: 0.1s; }
+        .side-menu.active .nav-links li:nth-child(2) { transition-delay: 0.15s; }
+        .side-menu.active .nav-links li:nth-child(3) { transition-delay: 0.2s; }
+        .side-menu.active .nav-links li:nth-child(4) { transition-delay: 0.25s; }
+        .side-menu.active .nav-links li:nth-child(5) { transition-delay: 0.3s; }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); background: rgba(0, 86, 179, 0.05); }
+
+        /* ZONE PRINCIPALE */
+        main {
+            padding: 80px 5% 80px;
+            max-width: 1250px;
+            margin: auto;
+        }
+
+        .page-title {
+            font-size: clamp(2.3rem, 7vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 20%, var(--accent) 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cinemaReveal 0.8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards 0.2s;
+        }
+
+        @keyframes cinemaReveal { to { opacity: 1; transform: translateY(0); } }
+
+        /* CONTROLES TRÉGULIERS */
+        .controls-wrapper {
+            max-width: 640px;
+            margin: 0 auto 45px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: cinemaReveal 0.8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards 0.3s;
+        }
+
+        .search-container { position: relative; width: 100%; }
+
+        #searchBar {
+            width: 100%;
+            padding: 18px 28px 18px 60px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 86, 179, 0.02);
+            font-size: 1.05rem;
+            color: var(--text);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #searchBar:focus { border-color: rgba(0, 86, 179, 0.25); background: white; box-shadow: 0 15px 35px rgba(0, 86, 179, 0.06); }
+        .search-container i { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 1.15rem; }
+
+        /* BOUTON LANCEUR GOOGLE MAPS DIRECT */
+        .btn-map-trigger {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-map-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25);
+            background: linear-gradient(135deg, var(--primary) 0%, #004494 100%);
+        }
+
+        .btn-map-trigger i { font-size: 1.1rem; color: var(--accent); }
+
+        /* CONTENEUR EMBED GOOGLE MAPS PROPRE */
+        .map-section-container {
+            max-width: 1140px;
+            margin: 0 auto 50px;
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.1, 0.8, 0.2, 1);
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+        }
+
+        .map-section-container.open {
+            height: 500px;
+            opacity: 1;
+            margin-bottom: 55px;
+        }
+
+        #googleMapsIframe { width: 100%; height: 100%; border: none; }
+
+        /* GRILLE DE CATALOGUE */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 30px; }
+
+        .card {
+            background: var(--surface);
+            border-radius: 26px;
+            padding: 26px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0, 86, 179, 0.02);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.1, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .card.reveal { opacity: 1; transform: translateY(0); }
+
+        .card::before {
+            content: ""; position: absolute; inset: 0;
+            background: radial-gradient(600px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(14, 165, 233, 0.08), transparent 50%);
+            z-index: 1; pointer-events: none; opacity: 0; transition: opacity 0.4s;
+        }
+        .card:hover::before { opacity: 1; }
+        .card:hover { transform: translateY(-6px); border-color: rgba(0, 86, 179, 0.2); background: var(--surface-hover); box-shadow: 0 20px 40px rgba(0, 86, 179, 0.07); }
+
+        .category {
+            align-self: flex-start;
+            background: rgba(0, 86, 179, 0.06);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card img {
+            width: 100%; height: 190px; object-fit: cover; border-radius: 18px; margin-bottom: 20px;
+            position: relative; z-index: 2; transition: transform 0.5s ease;
+        }
+        .card:hover img { transform: scale(1.02); }
+
+        .card h3 { font-size: 1.35rem; font-weight: 700; color: var(--text); margin-bottom: 8px; position: relative; z-index: 2; }
+        .card p { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; flex-grow: 1; line-height: 1.6; position: relative; z-index: 2; }
+
+        .btn-cta {
+            background: var(--primary); color: white; text-align: center; padding: 15px; border-radius: 14px;
+            text-decoration: none; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: all 0.3s ease; position: relative; z-index: 2;
+        }
+        .btn-cta:hover { background: #004494; transform: translateY(-1px); }
+
+        .no-results { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--muted); display: none; }
+
+        #top {
+            position: fixed; bottom: 30px; right: 30px; width: 48px; height: 48px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--border);
+            color: var(--primary); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            z-index: 99; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        #top.visible { opacity: 1; visibility: visible; }
+        #top:hover { background: var(--primary); color: white; }
+
+        @media(max-width: 768px) {
+            header { padding: 14px 24px; }
+            .side-menu { width: 300px; padding: 90px 24px 40px; }
+            main { padding: 55px 16px 60px; }
+            .grid-container { gap: 20px; }
+            .card { padding: 22px; border-radius: 22px; }
+            .map-section-container.open { height: 380px; }
         }
     </style>
 </head>
+
 <body>
 
-    <header>
-        <div class="logo">KinSanté</div>
-        <div class="hamburger" onclick="document.getElementById('nav').classList.toggle('active')"><i class="fas fa-bars"></i></div>
-        <nav>
-            <ul class="nav-links" id="nav">
-                <li><a href="index.html">Accueil</a></li>
-                <li><a href="sante.html">Santé</a></li>
-                <li><a href="medicaments.html">Médicaments</a></li>
-                <li><a href="recommandations.html">Recommandés</a></li>
-                <li><a href="communique.html">Communiqués</a></li>
-            </ul>
-        </nav>
-    </header>
+<div class="ambient-glow"></div>
 
-    <main>
-        <h1 class="page-title">Annuaire Santé</h1>
+<div id="loader">
+    <div class="spinner-box">
+        <div class="spinner"></div>
+    </div>
+    <p style="margin-top: 18px; color: var(--muted); font-size: 0.9rem; font-weight: 500;">Chargement de KinSanté...</p>
+</div>
+
+<header>
+    <div class="logo">
+        <img src="logo-kinsante.png" alt="KinSanté">
+        Kin<span>Santé</span> RDC
+    </div>
+
+    <div class="hamburger" id="hamburger-btn">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div class="menu-overlay" id="menu-overlay"></div>
+
+    <nav class="side-menu" id="side-menu">
+        <ul class="nav-links">
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="sante.html" class="active">Santé</a></li>
+            <li><a href="medicaments.html">Médicaments</a></li>
+            <li><a href="recommandations.html">Recommandés</a></li>
+            <li><a href="communique.html">Communiqués</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <h1 class="page-title">Annuaire & Cartographie</h1>
+    
+    <div class="controls-wrapper">
+        <div class="search-container">
+            <input type="text" id="searchBar" onkeyup="filterAnnuaire()" placeholder="Filtrer les cartes ci-dessous (ex: Dentiste, Clinique)...">
+            <i class="fas fa-search"></i>
+        </div>
         
-        <div class="search-wrapper">
-            <input type="text" id="searchBar" onkeyup="filterAnnuaire()" placeholder="Rechercher (ex: Dentiste, Clinique, Hôpital)...">
-        </div>
+        <button class="btn-map-trigger" id="mapTriggerBtn" onclick="openGoogleMapsEmbed()">
+            <i class="fas fa-map-marked-alt"></i> Ouvrir Google Maps : Hôpitaux à proximité
+        </button>
+    </div>
 
-        <div class="grid-container" id="annuaireList">
-            <div class="card">
-                <span class="category">Clinique</span>
-                <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=500" alt="Clinique">
-                <h3>Centre Ngaliema</h3>
-                <p>Soins d'urgence et chirurgie 24/7.</p>
-                <a href="https://wa.me/243819679859" class="btn-cta">Contacter</a>
-            </div>
-        </div>
-    </main>
+    <div class="map-section-container" id="mapSection">
+        <iframe id="googleMapsIframe" src="" allowfullscreen="" loading="lazy"></iframe>
+    </div>
 
-    <script>
-        function filterAnnuaire() {
-            let input = document.getElementById('searchBar').value.toLowerCase();
-            let cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                // On cherche dans tout le contenu de la carte (Catégorie, Titre, Description)
-                let text = card.innerText.toLowerCase();
-                card.style.display = text.includes(input) ? "" : "none";
-            });
+    <div class="grid-container" id="annuaireList">
+        <div class="no-results" id="noResultsState">Aucun établissement trouvé.</div>
+
+        <div class="card">
+            <span class="category">Clinique</span>
+            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=500" alt="Clinique">
+            <h3>Centre Médical Ngaliema</h3>
+            <p>Soins d'urgence complets, pédiatrie spécialisée et chirurgie avancée disponibles 24h/7.</p>
+            <a href="https://wa.me/243819679859" class="btn-cta" target="_blank"><i class="fab fa-whatsapp"></i> Contacter</a>
+        </div>
+    </div>
+</main>
+
+<button id="top" aria-label="Retour en haut de page"><i class="fa fa-arrow-up"></i></button>
+
+<script>
+// 1. LOADER 
+window.addEventListener("DOMContentLoaded", () => {
+    const loader = document.getElementById("loader");
+    setTimeout(() => { loader.style.opacity = "0"; loader.style.visibility = "hidden"; }, 500);
+});
+
+// 2. LOGIQUE DRAWER MENU
+const hamburgerBtn = document.getElementById("hamburger-btn");
+const sideMenu = document.getElementById("side-menu");
+const menuOverlay = document.getElementById("menu-overlay");
+
+function toggleMenu() {
+    hamburgerBtn.classList.toggle("open");
+    sideMenu.classList.toggle("active");
+    menuOverlay.classList.toggle("active");
+}
+hamburgerBtn.addEventListener("click", toggleMenu);
+menuOverlay.addEventListener("click", toggleMenu);
+
+// 3. FONCTION FILTRE DE TEXTE
+function filterAnnuaire() {
+    let input = document.getElementById('searchBar').value.toLowerCase().trim();
+    let cards = document.querySelectorAll('#annuaireList .card');
+    let noResults = document.getElementById('noResultsState');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        let text = card.innerText.toLowerCase();
+        if (text.includes(input)) {
+            card.style.display = "";
+            visibleCount++;
+        } else {
+            card.style.display = "none";
         }
-    </script>
+    });
+    noResults.style.display = (visibleCount === 0 && input !== "") ? "block" : "none";
+}
+
+// 4. L'INGÉNIOSITÉ GOOGLE MAPS SANS FRAIS NI CLÉ API REQUUISE
+function openGoogleMapsEmbed() {
+    const mapSection = document.getElementById("mapSection");
+    const mapIframe = document.getElementById("googleMapsIframe");
+    const mapBtn = document.getElementById("mapTriggerBtn");
+
+    // Si la carte est déjà ouverte, on la ferme
+    if(mapSection.classList.contains("open")) {
+        mapSection.classList.remove("open");
+        mapIframe.src = ""; // Coupe le chargement en arrière-plan
+        mapBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Ouvrir Google Maps : Hôpitaux à proximité';
+        return;
+    }
+
+    mapBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initialisation de Google Maps...';
+
+    // Demander la géolocalisation de l'utilisateur
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                // Construction de l'URL Google Maps Embed officielle avec recherche ciblée sur Hôpital/Hospitals
+                // Le mot clé "hospital" force l'affichage immédiat des marqueurs rouges Google Maps
+                const googleEmbedUrl = `https://maps.google.com/maps?q=hospital&t=&z=14&ie=UTF8&iwloc=&output=embed&ll=${lat},${lng}`;
+
+                // Injecte l'Iframe Google Maps et anime l'ouverture du panneau
+                mapIframe.src = googleEmbedUrl;
+                mapSection.classList.add("open");
+                mapBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Masquer Google Maps';
+            },
+            (error) => {
+                // Secours si l'utilisateur refuse la localisation ou si le GPS est éteint : On centre par défaut sur Kinshasa centre
+                const defaultLat = -4.325;
+                const defaultLng = 15.315;
+                const googleEmbedUrl = `https://maps.google.com/maps?q=hospital&t=&z=13&ie=UTF8&iwloc=&output=embed&ll=${defaultLat},${defaultLng}`;
+                
+                mapIframe.src = googleEmbedUrl;
+                mapSection.classList.add("open");
+                mapBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Masquer Google Maps';
+            }
+        );
+    } else {
+        alert("La navigation géolocalisée n'est pas supportée par ce navigateur.");
+    }
+}
+
+// 5. ANIMATION DES CARTES
+const cards = document.querySelectorAll(".card");
+const observerOptions = { root: null, threshold: 0.02 };
+const cardObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => { entry.target.classList.add("reveal"); }, index * 60);
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+cards.forEach(card => cardObserver.observe(card));
+
+// 6. GLOW SOURIS
+cards.forEach(card => {
+    card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+        card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+    });
+});
+
+// 7. GO TOP
+const topBtn = document.getElementById("top");
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 350) { topBtn.classList.add("visible"); } 
+    else { topBtn.classList.remove("visible"); }
+});
+topBtn.addEventListener("click", () => { window.scrollTo({ top: 0, behavior: "smooth" }); });
+</script>
+
 </body>
 </html>
